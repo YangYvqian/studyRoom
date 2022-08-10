@@ -1,0 +1,202 @@
+{% extends 'seatManage/base.html' %}
+{% load static %}
+{% block title %} 博客首页 {% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+        <div class="row">
+            <div class="col-xs-12 col-sm-1 col-md-1"></div>
+            <div class="col-xs-12 col-sm-1 col-md-1">
+                <img style="width: 160px; vertical-align: middle; text-align: center" src="{% static 'seatManage/logo.png' %}"></a>
+            </div>
+            <div class="col-xs-12 col-sm-1 col-md-1"></div>
+            <div class="col-xs-12 col-sm-9 col-md-9">
+                <form id="start_card" class="form-inline" action="{% url 'seatManage:add_user' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <label for="Name">姓名<span style="color: red">*</span></label>
+                      <input type="text" class="form-control" id="Name" placeholder="请输入姓名" name="username">
+                    </div>
+                    <div class="form-group">
+                      <label >性别<span style="color: red">*</span></label>
+                        <label>
+                            <select class="form-control"  name="sex">
+                              <option>请选择性别</option>
+                              <option value="男">男</option>
+                              <option value="女">女</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                      <label for="seat">座位<span style="color: red">*</span></label>
+                      <input type="text" class="form-control" id="seat" placeholder="请选择的座位号1-42" name="seat">
+                    </div>
+                    <div class="form-group">
+                      <label for="cardClass">卡种<span style="color: red">*</span></label>
+<!--                      <input type="text" class="form-control" id="cardClass" placeholder="请选择卡的类型">-->
+                        <label>
+                            <select class="form-control" id="cardClass" name="cardClass">
+                                <option >请选择卡种</option>
+                                <option>日卡</option>
+                                <option>周卡</option>
+                                <option>月卡</option>
+                                <option>季卡</option>
+                                <option>半年卡</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                      <label for="fingerPrint">指纹<span style="color: red">*</span></label>
+                      <input type="text" class="form-control" id="fingerPrint" placeholder="请输入指纹" name="fingerPrint">
+                    </div>
+                    <div class="form-group">
+                      <label for="phone">电话<span style="color: red">*</span></label>
+                      <input type="text" class="form-control" id="phone" placeholder="请输入电话" name="phone">
+                    </div>
+
+                    <button type="button" class="btn btn-primary"  onclick="valid()">
+                        开卡
+                    </button>
+                    <label><span style="color: red">(带*号为必填项)</span></label>
+                </form>
+                <hr>
+                <form class="form-inline" id="update_form" action="{% url 'seatManage:update_user' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <label for="cardNum">卡号<span style="color: red">*</span></label>
+                      <input type="text" class="form-control" id="cardNum" placeholder="请输入卡号" name="cardNum">
+                    </div>
+
+                    <div class="form-group">
+                      <label for="updateSeat">座位号<span style="color: red">*</span></label>
+                      <input type="text" class="form-control" id="updateSeat" placeholder="请选择的座位号1-42" name="updateSeat"><span id="err" style="color: red"></span>
+                    </div>
+
+
+                    <div class="form-group">
+                      <label for="date">更改到期时间<span style="color: red">*</span></label>
+                      <input type="datetime-local" class="form-control" id="date" placeholder="请输入日期" name="date">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="sub()">更改用户信息</button>
+                    <label><span style="color: red">(带*号为必填项)</span></label>
+                    </form>
+            </div>
+        </div>
+</div>
+
+
+<div  class="row">
+    <div class="col-md-4">
+        <div class="thumbnail col-xs-12 col-sm-12 col-md-12 ">
+            <img src="{% static 'seatManage/localmap.jpg' %}" alt="..." class="img-thumbnail">
+            <img src="{% static 'seatManage/localmap.jpg' %}" alt="..." class="img-thumbnail">
+            <img src="{% static 'seatManage/localmap.jpg' %}" alt="..." class="img-thumbnail">
+            <img src="{% static 'seatManage/localmap.jpg' %}" alt="..." class="img-thumbnail">
+        </div>
+
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-7">
+        <div class="row">
+            {% for seat in seat_list %}
+                <div class="col-xs-4 col-sm-3 col-md-2">
+                    <div class="thumbnail">
+                        {% if seat.username and seat.flag == 1 %}
+                            <img src="{% static seat.img_seat_url %}" alt="..." class="img-thumbnail bg-danger">
+                            <div class="caption">
+                                <span style="font-size: 7px">用户：{{seat.username}}</span><br>
+                                <span style="font-size: 7px">卡号：{{seat.user_card_number}}</span><br>
+                                <span style="font-size: 7px">{{seat.user_card_class}}</span><br>
+                                <span style="font-size: 7px">剩余 <span class="label label-primary">{{seat.rest_day}}</span> 天</span><br>
+                            </div>
+
+                        {%else%}
+                            <img src="{% static seat.img_seat_url %}" alt="..." class="img-thumbnail bg-info">
+                            <div class="caption">
+                                <span style="font-size: 7px">您好！</span><br>
+                                <span style="font-size: 7px">岸上自习室</span><br>
+                                <span style="font-size: 7px">祝您顺利！</span><br>
+                                <span style="font-size: 7px">成功上岸！</span><br>
+                            </div>
+                          {% endif %}
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-1">
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    function valid(){
+        const username = $("#username").val().trim();
+        const sex = $("#username").val().trim();
+        const cardClass = $("#cardClass").val().trim();
+        const fingerPrint = $("#fingerPrint").val().trim();
+        const seat = $("#seat").val().trim();
+        const mobile = $("#phone").val().trim();
+        if(username==="" || sex==="" || cardClass==="" || seat === "" || fingerPrint==="" || mobile===""){
+            alert("带*为必填项，请填写！");
+        }
+
+        if(seat > 42 || seat < 0 ){
+            alert("座位号错误,座位号不能为空或者选择1-42之间的号码");
+            return false;
+        }
+
+        const regexp = /^1\d{10}$/; // 只校验1开头，后面还有10位数字
+        // var myreg=/^[1][3,4,5,7,8][0-9]{9}$/; // 校验号段，号段哪天更新了这里也要加上新号段
+        if (mobile!=="" && !regexp.test(mobile)) {
+            alert("手机号格式不正确！");
+            return false;
+        }
+        else {
+            $("#start_card").submit()
+            alert("开卡成功")
+            return true;
+        }
+    }
+
+    function sub(){
+        const cardNum = $("#cardNum").val().trim();
+        const updateSeat = $("#updateSeat").val().trim();
+        const date = $("#date").val().trim();
+        if(updateSeat>43 || updateSeat<0){
+            alert("输入的座位号有误，请重新输入！");
+        }
+
+        if(cardNum==="" || updateSeat==="" || date==="" ){
+            alert("带*为必填项，请填写！");
+        }else {
+            $("#update_form").submit();
+            alert("更新成功");
+            return true;
+        }
+    }
+
+    $("#updateSeat").blur(function (){
+        const updateSeat = $(this).val();
+        $.ajax({
+            url:"/seatManage/vail_seat",
+            data:{updateSeat:updateSeat,csrfmiddlewaretoken:'{{ csrf_token }}'},
+            type:'POST',
+            success:function (ret){
+                console.log(ret)
+                if(ret==='1'){
+                    $('#err').text(updateSeat+'号座位被占，请重新选择');
+                    alert(updateSeat+'号座位被占，请重新选择')
+
+                }
+            }
+        });
+    });
+
+
+</script>
+{%  endblock %}

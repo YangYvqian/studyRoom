@@ -1,0 +1,64 @@
+{% extends 'seatManage/base.html' %}
+{% load static %}
+{% block title %} 博客首页 {% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb alert alert-info">
+
+        <li><a href="#">查询所有用户信息</a></li>
+
+</div>
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div class="col-md-9"></div>
+        <div class="col-md-3">
+            <form class="navbar-form navbar-left" action="{% url 'seatManage:search' %}" method="post">
+                {% csrf_token %}
+                <input type="text" class="form-control" placeholder="请输入查询的卡号" name="cardNum">
+                <button type="submit" class="btn btn-default">查询</button>
+            </form>
+        </div>
+        <br><br>
+        {%if users%}
+        <table class="table table-hover">
+            <th>id</th><th>姓名</th><th>性别</th><th>座位号</th><th>指纹</th><th>卡号</th><th>卡类</th><th>电话</th><th>开卡时间</th>
+            <th>过期时间</th><th>最后修改时间</th><th>卡状态</th><th>暂停次数</th><th>暂停时间</th><th>标志</th>
+                {% for user_info in users %}
+                <tr>
+                    <td>{{user_info.id}}</td>
+                    <td>{{user_info.username}}</td>
+                    <td>{{user_info.user_sex}}</td>
+                    <td>{{user_info.user_seat_id}}</td>
+                    <td>{{user_info.user_fingerprint}}</td>
+                    <td>{{user_info.user_card_number}}</td>
+                    <td>{{user_info.user_card_class}}</td>
+                    <td>{{user_info.user_phone}}</td>
+                    <td>{{user_info.card_create_time}}</td>
+                    <td>{{user_info.card_expiration_time}}</td>
+                    <td>{{user_info.modified_time}}</td>
+                    <td>{{u.stop_flag}}</td>
+                    <td>{{user_info.stop_number}}</td>
+                    <td>{{user_info.stop_time}}</td>
+                    <td>{{user_info.flag}}</td>
+                </tr>
+                {% endfor %}
+        </table>
+        {%else%}
+        <h3>数据不存在</h3>
+        {%endif%}
+
+
+
+    </div>
+
+    <div class="col-md-1"></div>
+</div>
+<!--</div>-->
+
+
+{% endblock %}
+
+
